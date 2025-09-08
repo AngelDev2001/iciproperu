@@ -4,6 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "deploy:functions": "pnpm --filter @iciproperu/functions run deploy",
+    "deploy:hosting": "pnpm --filter @iciproperu/hosting run deploy",
+    "deploy:edu": "pnpm --filter @iciproperu/hosting-edu-platform run deploy",
+    "lint:check": "turbo run lint:check",
+    "lint:fix": "turbo run lint:fix",
+    "prettier:check": "turbo run prettier:check",
+    "prettier:format": "turbo run prettier:format",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,6 +20,10 @@
   "license": "ISC",
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
     "turbo": "^2.5.5"
   }
 }

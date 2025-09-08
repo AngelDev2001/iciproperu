@@ -1,5 +1,18 @@
 {
   "projects": {
-    "default": "iciproperu-d5827"
+    "default": "iciproperu-d5827",
+    "dev": "iciproperu-d5827-dev"
+  },
+  "targets:"{
+    "iciproperu-d5827": {
+      "hosting": {
+        "hosting": {
+          "iciproperu"
+        }
+        "api": {
+          "api-iciproperu"
+        }
+      }
+    }
   }
 }
