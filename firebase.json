@@ -17,10 +17,7 @@
         "*.local"
       ],
       "predeploy": [
-        "pnpm --filter functions run build",
-        "pnpm --filter functions run build",
-        "npm --prefix \"$RESOURCE_DIR\" run lint",
-        "npm --prefix \"$RESOURCE_DIR\" run build"
+        "pnpm --filter @iciproperu/functions run build"
       ]
     }
   ],
