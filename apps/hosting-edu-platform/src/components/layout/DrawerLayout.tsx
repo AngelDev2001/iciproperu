@@ -1,0 +1,756 @@
+import React from 'react';
+import { Drawer, Menu } from '../../components';
+import styled from 'styled-components';
+import { version } from '../../firebase';
+import {
+  faBarcode,
+  faBriefcase,
+  faBuildingUser,
+  faClipboardList,
+  faClipboardUser,
+  faComputer,
+  faCow,
+  faDog,
+  faDoorOpen,
+  faFileAlt,
+  faFileContract,
+  faFilePen,
+  faFileShield,
+  faGears,
+  faHistory,
+  faHome,
+  faHorse,
+  faHorseHead,
+  faIdCard,
+  faList,
+  faListCheck,
+  faNetworkWired,
+  faPeopleGroup,
+  faPoll,
+  faShapes,
+  faShield,
+  faSquareCheck,
+  faTicket,
+  faTriangleExclamation,
+  faUmbrellaBeach,
+  faUsers,
+  faUsersCog,
+  faVoteYea,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { includes, isEmpty } from 'lodash';
+
+export const DrawerLayout = ({
+  user,
+  isVisibleDrawer,
+  onSetIsVisibleDrawer,
+  currentCommand,
+  onNavigateTo,
+}) => {
+  const existsAclsInAclsOfUser = (category, subCategories = [], aclNames = []) => {
+    return subCategories
+      .map((subCategory) => {
+        if (isEmpty(user?.acls?.[category]?.[subCategory])) return false;
+
+        return user.acls?.[category]?.[subCategory].some((acl) => includes(aclNames, acl));
+      })
+      .some((acl) => acl);
+  };
+
+  const onClickMenu = (pathname) => {
+    onSetIsVisibleDrawer(false);
+    onNavigateTo(pathname);
+  };
+
+  const onClickHome = () => {
+    onSetIsVisibleDrawer(false);
+    onNavigateTo('/home');
+  };
+
+  const items = [
+    {
+      label: 'Home',
+      key: 'home',
+      icon: <FontAwesomeIcon icon={faHome} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('default', ['home'], ['/home']),
+      onClick: () => onClickHome(),
+    },
+    {
+      label: 'Control de Accesos (acls)',
+      key: 'group-acls',
+      icon: <FontAwesomeIcon icon={faUsersCog} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'accessControl',
+        ['defaultRolesAcls', 'manageAcls'],
+        ['/default-roles-acls', '/manage-acls'],
+      ),
+      children: [
+        {
+          label: 'Roles con Acls',
+          key: 'default-roles-acls',
+          isVisible: existsAclsInAclsOfUser(
+            'accessControl',
+            ['defaultRolesAcls'],
+            ['/default-roles-acls'],
+          ),
+          onClick: () => onClickMenu('/default-roles-acls'),
+        },
+        {
+          label: 'Administrador Acls',
+          key: 'manage-acls',
+          isVisible: existsAclsInAclsOfUser('accessControl', ['manageAcls'], ['/manage-acls']),
+          onClick: () => onClickMenu('/manage-acls'),
+        },
+      ],
+    },
+    {
+      label: 'Administración',
+      key: 'manager',
+      icon: <FontAwesomeIcon icon={faGears} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'administration',
+        ['users', 'entities-gu', 'departments', 'offices', 'sections'],
+        ['/users', '/entities-gu', '/departments', '/sections', '/offices'],
+      ),
+      children: [
+        {
+          label: 'Usuarios',
+          key: 'users',
+          icon: <FontAwesomeIcon icon={faUsers} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['users'], ['/users']),
+          onClick: () => onClickMenu(`/users?userType=${currentCommand?.id}`),
+        },
+        {
+          label: 'Entidades / G.U',
+          key: 'entities',
+          icon: <FontAwesomeIcon icon={faNetworkWired} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['entities-gu'], ['/entities-gu']),
+          onClick: () => onClickMenu('/entities-gu'),
+        },
+        {
+          label: 'Unidades',
+          key: 'units',
+          icon: <FontAwesomeIcon icon={faBuildingUser} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['units'], ['/units']),
+          onClick: () => onClickMenu('/units'),
+        },
+        {
+          label: 'Departamentos',
+          key: 'departments',
+          icon: <FontAwesomeIcon icon={faBuildingUser} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['departments'], ['/departments']),
+          onClick: () => onClickMenu('/departments'),
+        },
+        {
+          label: 'Secciones',
+          key: 'sections',
+          icon: <FontAwesomeIcon icon={faComputer} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['sections'], ['/sections']),
+          onClick: () => onClickMenu('/sections'),
+        },
+        {
+          label: 'Oficinas',
+          key: 'offices',
+          icon: <FontAwesomeIcon icon={faBriefcase} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['offices'], ['/offices']),
+          onClick: () => onClickMenu('/offices'),
+        },
+        {
+          label: 'Grupos de Trabajo',
+          key: 'work-groups',
+          icon: <FontAwesomeIcon icon={faPeopleGroup} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('administration', ['work-groups'], ['/work-groups']),
+          onClick: () => onClickMenu('/work-groups'),
+        },
+      ],
+    },
+    {
+      label: 'Assistencia',
+      key: 'assistance',
+      icon: <FontAwesomeIcon icon={faClipboardUser} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('default', ['assistances'], ['/assistances']),
+      children: [
+        {
+          label: 'Marcar asistencia',
+          key: 'assistance',
+          icon: <FontAwesomeIcon icon={faSquareCheck} size="lg" />,
+          isVisible: true,
+          onClick: () => onClickMenu('/assistances/assistance'),
+        },
+        {
+          label: 'Lista de asistencias',
+          key: 'assistances',
+          icon: <FontAwesomeIcon icon={faListCheck} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('default', ['assistances'], ['/assistances']),
+          onClick: () => onClickMenu('/assistances'),
+        },
+      ],
+    },
+    {
+      label: 'Elecciones',
+      key: 'election',
+      icon: <FontAwesomeIcon icon={faVoteYea} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['elections'], ['/elections', '/elections/new']),
+      children: [
+        {
+          label: 'Crear Eleccion',
+          key: 'election',
+          icon: <FontAwesomeIcon icon={faVoteYea} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['elections'], ['/elections/new']),
+          onClick: () => onClickMenu('/elections/new'),
+        },
+        {
+          label: 'Lista de Elecciones',
+          key: 'elections-list',
+          icon: <FontAwesomeIcon icon={faListCheck} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['elections'], ['/elections']),
+          onClick: () => onClickMenu('/elections'),
+        },
+      ],
+    },
+    {
+      label: 'Visitas',
+      key: 'visits',
+      icon: <FontAwesomeIcon icon={faDoorOpen} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['visits'], ['/visits', '/visits/new']),
+      children: [
+        {
+          label: 'Crear Visita',
+          key: 'visit',
+          icon: <FontAwesomeIcon icon={faDoorOpen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['visits'], ['/visits/new']),
+          onClick: () => onClickMenu('/visits/new'),
+        },
+        {
+          label: 'Lista de Visitas',
+          key: 'visit-list',
+          icon: <FontAwesomeIcon icon={faListCheck} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['visits'], ['/visits']),
+          onClick: () => onClickMenu('/visits'),
+        },
+        {
+          label: 'Lista de Visitantes Restringidos',
+          key: 'restricted-visitors-list',
+          icon: <FontAwesomeIcon icon={faClipboardList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['visits'], ['/visits/restricted-visitors']),
+          onClick: () => onClickMenu('/visits/restricted-visitors'),
+        },
+        {
+          label: 'Crear Visitante Restringido',
+          key: 'restricted-visitors',
+          icon: <FontAwesomeIcon icon={faTriangleExclamation} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['visits'],
+            ['/visits/restricted-visitors/new'],
+          ),
+          onClick: () => onClickMenu('/visits/restricted-visitors/new'),
+        },
+      ],
+    },
+    {
+      label: 'Sorteos',
+      key: 'raffles',
+      icon: <FontAwesomeIcon icon={faTicket} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['raffles'], ['/raffles', '/raffles/new']),
+      children: [
+        {
+          label: 'Crear Sorteo',
+          key: 'raffle',
+          icon: <FontAwesomeIcon icon={faTicket} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['raffles'], ['/raffles/new']),
+          onClick: () => onClickMenu('/raffles/new'),
+        },
+        {
+          label: 'Lista de Sorteos',
+          key: 'raffles-list',
+          icon: <FontAwesomeIcon icon={faListCheck} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['raffles'], ['/raffles']),
+          onClick: () => onClickMenu('/raffles'),
+        },
+      ],
+    },
+    {
+      label: 'Tutoriales',
+      key: 'tutorials',
+      icon: <FontAwesomeIcon icon={faShapes} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['tutorials'], ['/tutorials', '/tutorials/new']),
+      children: [
+        {
+          label: 'Crear Tutorial',
+          key: 'tutorial',
+          icon: <FontAwesomeIcon icon={faShapes} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['tutorials'], ['/tutorials/new']),
+          onClick: () => onClickMenu('/tutorials/new'),
+        },
+        {
+          label: 'Lista de Tutoriales',
+          key: 'tutorial-list',
+          icon: <FontAwesomeIcon icon={faListCheck} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['tutorials'], ['/tutorials']),
+          onClick: () => onClickMenu('/tutorials'),
+        },
+      ],
+    },
+    {
+      label: 'Correspondencias',
+      key: 'files',
+      icon: <FontAwesomeIcon icon={faClipboardList} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['correspondences'],
+        ['/correspondences/new', '/correspondences'],
+      ),
+      children: [
+        {
+          label: 'Listas de Correspondencias',
+          key: 'correspondences',
+          icon: <FontAwesomeIcon icon={faListCheck} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['correspondences'],
+            ['/correspondences', '/correspondences/requests-agreements'],
+          ),
+          children: [
+            {
+              label: 'Lista de Convenios',
+              key: 'requests-agreements',
+              icon: <FontAwesomeIcon icon={faList} size="lg" />,
+              isVisible: existsAclsInAclsOfUser(
+                'public',
+                ['correspondences'],
+                ['/correspondences', '/correspondences/requests-agreements'],
+              ),
+              onClick: () => onClickMenu('/correspondences/requests-agreements'),
+            },
+            {
+              label: 'Lista de solicitudes de codigo de descuento',
+              key: 'discount-codes-requests',
+              icon: <FontAwesomeIcon icon={faList} size="lg" />,
+              isVisible: existsAclsInAclsOfUser(
+                'public',
+                ['correspondences'],
+                ['/correspondences', '/correspondences/discount-codes-requests'],
+              ),
+              onClick: () => onClickMenu('/correspondences/discount-codes-requests'),
+            },
+          ],
+        },
+        {
+          label: 'Realizar correspondencia',
+          key: 'correspondence',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['correspondences'],
+            ['/correspondences/new'],
+          ),
+          onClick: () => onClickMenu('/correspondences/new'),
+        },
+      ],
+    },
+    {
+      label: 'Encuestas',
+      key: 'surveys',
+      icon: <FontAwesomeIcon icon={faPoll} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['survey-organizational-climate-studies'],
+        ['/organizational-climate-studies'],
+      ),
+      children: [
+        {
+          label: 'Estudio del Clima Organizacional',
+          key: 'organizational-climate-studies',
+          icon: <FontAwesomeIcon icon={faFileAlt} size="lg" />,
+          isVisible: true,
+          onClick: () => onClickMenu('/surveys/organizational-climate-studies'),
+        },
+      ],
+    },
+    {
+      label: 'Jefatura de bienestar del ejército (COBIENE)',
+      key: 'jefatura-de-bienestar-del-ejercito',
+      icon: <FontAwesomeIcon icon={faShield} size="lg" />,
+      isVisible:
+        existsAclsInAclsOfUser(
+          'jefatura-de-bienestar-del-ejercito',
+          ['inscriptions'],
+          ['/inscriptions'],
+        ) && currentCommand?.id === 'copere',
+      children: [
+        {
+          label: 'Inscripciones',
+          key: 'inscriptions',
+          icon: <FontAwesomeIcon icon={faIdCard} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'jefatura-de-bienestar-del-ejercito',
+            ['inscriptions'],
+            ['/inscriptions'],
+          ),
+          children: [
+            {
+              key: 'military-circle',
+              label: 'Circulo Militar',
+              isVisible: existsAclsInAclsOfUser(
+                'jefatura-de-bienestar-del-ejercito',
+                ['inscriptions'],
+                ['/inscriptions/cmsts'],
+              ),
+              onClick: () => onClickMenu('/inscriptions/cmsts'),
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: 'Servicio de veterinaria y remonta del ejército',
+      key: 'servicio-de-veterinaria-y-remonta-del-ejercito',
+      icon: <FontAwesomeIcon icon={faHorseHead} size="lg" />,
+      isVisible:
+        existsAclsInAclsOfUser(
+          'servicio-de-veterinaria-y-remonta-del-ejercito',
+          ['animals'],
+          ['/animals'],
+        ) && currentCommand?.id === 'cologe',
+      children: [
+        {
+          key: 'equines',
+          icon: <FontAwesomeIcon icon={faHorse} size="lg" />,
+          label: 'Equinos',
+          isVisible: existsAclsInAclsOfUser(
+            'servicio-de-veterinaria-y-remonta-del-ejercito',
+            ['animals'],
+            ['/animals'],
+          ),
+          onClick: () =>
+            onClickMenu(
+              '/entities/servicio-de-veterinaria-y-remonta-del-ejercito/animals?animalType=equine',
+            ),
+        },
+        {
+          key: 'cattle',
+          icon: <FontAwesomeIcon icon={faCow} size="lg" />,
+          label: 'Vacunos',
+          isVisible: existsAclsInAclsOfUser(
+            'servicio-de-veterinaria-y-remonta-del-ejercito',
+            ['animals'],
+            ['/animals'],
+          ),
+          onClick: () =>
+            onClickMenu(
+              '/entities/servicio-de-veterinaria-y-remonta-del-ejercito/animals?animalType=cattle',
+            ),
+        },
+        {
+          key: 'canines',
+          icon: <FontAwesomeIcon icon={faDog} size="lg" />,
+          label: 'Caninos',
+          isVisible: existsAclsInAclsOfUser(
+            'servicio-de-veterinaria-y-remonta-del-ejercito',
+            ['animals'],
+            ['/animals'],
+          ),
+          onClick: () =>
+            onClickMenu(
+              '/entities/servicio-de-veterinaria-y-remonta-del-ejercito/animals?animalType=canine',
+            ),
+        },
+        {
+          key: 'histories',
+          icon: <FontAwesomeIcon icon={faHistory} size="lg" />,
+          label: 'Historial de animales',
+          isVisible: existsAclsInAclsOfUser(
+            'servicio-de-veterinaria-y-remonta-del-ejercito',
+            ['animalLogs'],
+            ['/animal-logs'],
+          ),
+          onClick: () =>
+            onClickMenu(
+              '/entities/servicio-de-veterinaria-y-remonta-del-ejercito/animal-logs?animalType=all',
+            ),
+        },
+      ],
+    },
+    {
+      label: 'Convenios',
+      key: 'agreements',
+      icon: <FontAwesomeIcon icon={faFileContract} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['agreements'],
+        ['/agreements', '/agreements/new'],
+      ),
+      children: [
+        {
+          label: 'Crear Convenio',
+          key: 'application-request',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['agreements'], ['/agreements/new']),
+          onClick: () => onClickMenu('/agreements/new'),
+        },
+        {
+          label: 'Lista de Covenios',
+          key: 'agreements-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['agreements'],
+            ['/agreements', '/agreements/list'],
+          ),
+          onClick: () => onClickMenu('/agreements'),
+        },
+      ],
+    },
+    {
+      label: 'Solicitudes (DAS)',
+      key: 'public',
+      icon: <FontAwesomeIcon icon={faShield} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['dasRequests'],
+        ['/das-requests', '/das-requests/new'],
+      ),
+      children: [
+        {
+          label: 'Realizar Solicitud',
+          key: 'application-request',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['dasRequests'], ['/das-requests/new']),
+          onClick: () => onClickMenu('/entities/departamento-de-apoyo-social/das-requests/new'),
+        },
+        {
+          key: 'requests-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          label: 'Lista de solicitudes',
+          isVisible: existsAclsInAclsOfUser('public', ['dasRequests'], ['/das-requests']),
+          onClick: () => onClickMenu('/entities/departamento-de-apoyo-social/das-requests'),
+        },
+      ],
+    },
+    {
+      label: 'Reclutamiento militar',
+      key: 'military-recruitment',
+      icon: <FontAwesomeIcon icon={faShield} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['militaryServiceRecruitment'],
+        ['/military-service-recruitment', '/military-service-recruitment/new'],
+      ),
+      children: [
+        {
+          label: 'Realizar inscripción',
+          key: 'military-service-recruitment',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['militaryServiceRecruitment'],
+            ['/military-service-recruitment/new'],
+          ),
+          onClick: () => onClickMenu('/military-service-recruitment/new'),
+        },
+        {
+          label: 'Lista de inscripciones',
+          key: 'military-service-recruitment-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['militaryServiceRecruitment'],
+            ['/military-service-recruitment'],
+          ),
+          onClick: () => onClickMenu('/military-service-recruitment'),
+        },
+      ],
+    },
+    {
+      label: 'Solicitud de Vacaciones',
+      key: 'holidays',
+      icon: <FontAwesomeIcon icon={faUmbrellaBeach} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['holidaysRequest'],
+        ['/holidays-request', '/holidays-request/new'],
+      ),
+      children: [
+        {
+          label: 'Realizar solicitud',
+          key: 'holidays-request',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['holidaysRequest'],
+            ['/holidays-request/new'],
+          ),
+          onClick: () => onClickMenu('/holidays-request/new'),
+        },
+        {
+          label: 'Lista de solicitudes',
+          key: 'holidays-request-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['holidaysRequest'], ['/holidays-request']),
+          onClick: () => onClickMenu('/holidays-request'),
+        },
+      ],
+    },
+    {
+      label: 'Códigos de descuento',
+      key: 'discount-codes',
+      icon: <FontAwesomeIcon icon={faBarcode} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['discountCodes'], ['/discount-codes']),
+      children: [
+        {
+          label: 'Registrar Código',
+          key: 'discount-codes-register',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['discountCodes'],
+            ['/discount-codes', '/discount-codes/new'],
+          ),
+          onClick: () => onClickMenu('/discount-codes/new'),
+        },
+        {
+          label: 'Lista de Códigos',
+          key: 'discount-codes-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['discountCodes'], ['/discount-codes']),
+          onClick: () => onClickMenu('/discount-codes'),
+        },
+      ],
+    },
+    {
+      label: 'Solicitud de código de descuento',
+      key: 'discount-codes-requests',
+      icon: <FontAwesomeIcon icon={faClipboardList} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['discountCodesRequests'],
+        ['/discount-codes-requests'],
+      ),
+      children: [
+        {
+          label: 'Lista de solicitudes',
+          key: 'coupons-codes-requests-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['discountCodesRequests'],
+            ['/discount-codes-requests'],
+          ),
+          onClick: () => onClickMenu('/discount-codes-requests'),
+        },
+      ],
+    },
+    {
+      label: 'Reportes Tecnicos',
+      key: 'technicalReports',
+      icon: <FontAwesomeIcon icon={faFileAlt} size="lg" />,
+      isVisible: existsAclsInAclsOfUser(
+        'public',
+        ['technicalReports'],
+        ['/technical-reports', '/technical-reports/new'],
+      ),
+      children: [
+        {
+          label: 'Crear Reporte Tecnico',
+          key: 'technical-reports',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser(
+            'public',
+            ['technicalReports'],
+            ['/technical-reports/new'],
+          ),
+          onClick: () => onClickMenu('/technical-reports/new'),
+        },
+        {
+          label: 'Lista de Reportes Tecnicos',
+          key: 'technical-reports-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['technicalReports'], ['/technical-reports']),
+          onClick: () => onClickMenu('/technical-reports'),
+        },
+      ],
+    },
+    {
+      label: 'Orden de servicio',
+      key: 'service-orders',
+      icon: <FontAwesomeIcon icon={faFileContract} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['serviceOrders'], ['/service-orders']),
+      children: [
+        {
+          label: 'Realizar Orden de Servicio',
+          key: 'service-order',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['serviceOrders'], ['/service-orders/new']),
+          onClick: () => onClickMenu('/service-orders/new'),
+        },
+        {
+          label: 'Lista de Ordenes de Servicio',
+          key: 'service-orders-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['serviceOrders'], ['/service-orders']),
+          onClick: () => onClickMenu('/service-orders'),
+        },
+      ],
+    },
+    {
+      label: 'Actuarios',
+      key: 'actuaries',
+      icon: <FontAwesomeIcon icon={faFileShield} size="lg" />,
+      isVisible: existsAclsInAclsOfUser('public', ['actuaries'], ['/actuaries']),
+      children: [
+        {
+          label: 'Realizar Actuario',
+          key: 'actuary',
+          icon: <FontAwesomeIcon icon={faFilePen} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['actuaries'], ['/actuaries/new']),
+          onClick: () => onClickMenu('/actuaries/new'),
+        },
+        {
+          label: 'Lista de Actuarios',
+          key: 'actuaries-list',
+          icon: <FontAwesomeIcon icon={faList} size="lg" />,
+          isVisible: existsAclsInAclsOfUser('public', ['actuaries'], ['/actuaries']),
+          onClick: () => onClickMenu('/actuaries'),
+        },
+      ],
+    },
+  ];
+
+  const filterByRoleCode = (items) => {
+    return items.filter((item) => {
+      if (item?.children) {
+        item.children = (item?.children || []).filter((_children) => _children.isVisible);
+      }
+
+      return item.isVisible;
+    });
+  };
+
+  return (
+    <DrawerContainer
+      key="right"
+      title={
+        <div style={{ width: '100%', textAlign: 'right' }}>
+          <h5 style={{ color: '#fff' }}>version: {version}</h5>
+        </div>
+      }
+      placement="left"
+      width={330}
+      closable={true}
+      onClose={() => onSetIsVisibleDrawer(!isVisibleDrawer)}
+      open={isVisibleDrawer}
+      className="drawer-content"
+      bodyStyle={{ padding: '0' }}
+    >
+      <div className="logo" />
+      <Menu defaultSelectedKeys={['1']} mode="inline" items={filterByRoleCode(items)} />
+    </DrawerContainer>
+  );
+};
+
+const DrawerContainer = styled(Drawer)`
+  .drawer-content {
+    color: #fff;
+  }
+`;
