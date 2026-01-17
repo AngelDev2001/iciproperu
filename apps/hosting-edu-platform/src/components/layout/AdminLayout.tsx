@@ -1,45 +1,37 @@
-import React, { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { DrawerLayout } from './DrawerLayout';
 import { HeaderLayout } from './HeaderLayout';
 import { FooterLayout } from './FooterLayout';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { BreadcrumbLayout } from './Breadcrumb';
-import { useAuthentication, useCommand } from '../../providers';
-import { Layout, Spin } from '../ui';
+import { useAuthentication } from '../../providers';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { firestore } from '../../firebase';
-import { Alert } from 'antd';
+import { doc } from '../../firebase/firestore.ts';
+import { Alert, Layout, Spin } from '../ui';
 
 const { Content } = Layout;
 
-export const AdminLayout = ({ children }) => {
+interface AdminLayoutProps {
+  children: ReactNode;
+}
+
+export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { authUser, logout } = useAuthentication();
-  const { currentCommand, onChangeCommand } = useCommand();
 
-  const [isChangeCommand, setIsChangeCommand] = useState(false);
   const [isVisibleDrawer, setIsVisibleDrawer] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
-  const onNavigateTo = (url) => navigate(url);
+  const onNavigateTo = (url: string) => navigate(url);
 
   const [settingDefault, settingDefaultLoading, settingDefaultError] = useDocumentData(
-    firestore.collection('settings').doc('default'),
+    doc(firestore, 'settings', 'default'),
   );
 
-  const onChangeDefaultCommand = async (command) => {
-    try {
-      setIsChangeCommand(true);
-      onChangeCommand(command.id);
-    } finally {
-      setOpenDropdown(false);
-      setIsChangeCommand(false);
-    }
-  };
-
   return (
-    <Spin tip="Cargando..." spinning={isChangeCommand} className="spin-item">
+    <Spin tip="Cargando..." className="spin-item">
       <LayoutContainer>
         <Layout className="site-layout">
           {settingDefault?.['system-update-message'].isVisible && (
@@ -55,7 +47,6 @@ export const AdminLayout = ({ children }) => {
             user={authUser}
             isVisibleDrawer={isVisibleDrawer}
             onSetIsVisibleDrawer={setIsVisibleDrawer}
-            currentCommand={currentCommand}
             onNavigateTo={onNavigateTo}
           />
           <HeaderLayout
@@ -65,8 +56,6 @@ export const AdminLayout = ({ children }) => {
             setIsVisibleDrawer={setIsVisibleDrawer}
             openDropdown={openDropdown}
             onOpenDropdown={setOpenDropdown}
-            onChangeDefaultCommand={onChangeDefaultCommand}
-            currentCommand={currentCommand}
             onLogout={logout}
           />
           <Content style={{ margin: '0 16px' }}>

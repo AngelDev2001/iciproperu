@@ -8,8 +8,10 @@ import type {
 import {
   arrayRemove,
   arrayUnion,
+  collection,
   deleteDoc,
   deleteField,
+  doc,
   getDoc,
   getDocs,
   increment,
@@ -96,3 +98,19 @@ export const mergeDocument = async <T extends DocumentData>(
  */
 export const deleteDocument = async <T extends DocumentData>(docRef: DocumentReference<T>) =>
   deleteDoc(docRef);
+
+export {
+  doc,
+  collection,
+  arrayRemove,
+  arrayUnion,
+  deleteDoc,
+  deleteField,
+  getDoc,
+  getDocs,
+  increment,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+};
