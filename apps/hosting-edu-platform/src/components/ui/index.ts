@@ -1,3 +1,5 @@
-import { Alert, Drawer, Layout, Menu, Spin } from 'antd';
+import { Alert, Divider, Drawer, Dropdown, Layout, Menu, Spin, Spinner } from 'antd';
 
-export { Layout, Spin, Alert, Drawer, Menu };
+export * from './notification';
+
+export { Spinner, Layout, Spin, Alert, Drawer, Menu, Divider, Dropdown };

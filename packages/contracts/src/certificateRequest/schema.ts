@@ -24,27 +24,25 @@ export const CertificateGradeSchema = z.object({
 /** Entity */
 export const CertificateRequestSchema = z.object({
   id: z.string(),
-  document: {
-    type: z.string(),
-    number: z.string(),
-  },
-  firstName: z.string(),
-  paternalSurname: z.string(),
-  maternalSurname: z.string(),
-  fullName: z.string(),
-  email: z.string(),
-  phone: {
-    prefix: z.string().optional(),
-    number: z.string().optional(),
-  },
+  holder: z.object({
+    document: {
+      type: z.string(),
+      number: z.string(),
+    },
+    firstName: z.string(),
+    paternalSurname: z.string(),
+    maternalSurname: z.string(),
+    fullName: z.string(),
+    email: z.string(),
+    phone: {
+      prefix: z.string().optional(),
+      number: z.string().optional(),
+    },
+  }),
   courseId: z.string(),
   courseNameSnapshot: z.string(),
   status: CertificateStatusSchema,
   grades: z.array(CertificateGradeSchema),
   average: z.number().min(17).max(19),
-  pdfDraftPath: z.string(),
-  pdfFinalPath: z.string().optional(),
   certificateCode: z.string().optional(),
-  createdBy: z.string(),
-  createdAt: z.string(),
 });
