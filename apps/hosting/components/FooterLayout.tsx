@@ -97,7 +97,7 @@ export function FooterLayout() {
               Aceptamos transferencias y depósitos a nivel nacional.
             </p>
             <div className="flex items-center gap-3 mb-6">
-              <div className="relative h-8 w-12 border p-2 rounded p-1">
+              <div className="relative h-8 w-12 border p-2 rounded">
                 <Image
                   src="/logo-bn.png"
                   alt="Banco de la Nación"
@@ -105,7 +105,7 @@ export function FooterLayout() {
                   className="object-contain"
                 />
               </div>
-              <div className="relative h-8 w-12 border p-2 rounded p-1">
+              <div className="relative h-8 w-12 border p-2 rounded">
                 <Image src="/logo-bcp.png" alt="BCP" fill className="object-contain" />
               </div>
             </div>
