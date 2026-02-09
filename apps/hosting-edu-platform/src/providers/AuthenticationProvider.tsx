@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../firebase';
 import { isError, isObject } from 'lodash';
-import { notification, Spinner } from '../components';
+import { Spinner, useNotification } from '../components';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
-import { rolesAclsRef, usersRef } from '../firebase/collections';
 import { authPersistence } from '../firebase/auth';
 
 const AuthenticationContext = createContext({
@@ -19,6 +18,8 @@ export const AuthenticationProvider = ({ children }) => {
   const [loginLoading, setLoginLoading] = useState(false);
 
   const { firebaseUser, firebaseUserLoading } = useFirebaseUser();
+
+  const { notification } = useNotification();
 
   const [user, userLoading, userError] = useDocumentData(
     firebaseUser ? usersRef.doc(firebaseUser.uid) : null,

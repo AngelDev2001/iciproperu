@@ -1,230 +1,120 @@
-import React, { cloneElement, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Layout, Space, theme } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowsRotate, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
-import { LogoPrimary, PhotoNoFound } from '../../images';
-import { mediaQuery } from '../../styles';
-import { capitalize, orderBy } from 'lodash';
-import { Divider, Dropdown } from '../ui';
 import { Link } from 'react-router-dom';
-import { userFullName } from '../../utils';
-import { useGlobalData } from '../../providers';
-import { Roles } from '../../data-list';
+import { mediaQuery } from '../../styles';
+// import { useGlobalData } from '../../providers';
+// import { Roles } from '../../data-list';
 import { useDevice } from '../../hooks';
 
 const { Header } = Layout;
 const { useToken } = theme;
 
-export const HeaderLayout = ({
+type User = {
+  roleCode?: string;
+  profilePhoto?: { thumbUrl?: string };
+};
+
+type Props = {
+  user: User | null;
+  isVisibleDrawer: boolean;
+  setIsVisibleDrawer: (v: boolean) => void;
+  openDropdown: boolean;
+  onOpenDropdown: (open: boolean) => void;
+  onNavigateTo: (path: string) => void;
+  onLogout: () => Promise<void> | void;
+};
+
+export const HeaderLayout: React.FC<Props> = ({
   user,
   isVisibleDrawer,
   setIsVisibleDrawer,
   openDropdown,
   onOpenDropdown,
   onNavigateTo,
-  onChangeDefaultCommand,
-  currentCommand,
   onLogout,
 }) => {
   const { token } = useToken();
   const { rolesAcls } = useGlobalData();
   const { isMobile } = useDevice();
 
-  const [isVisibleMoreCommands, setIsVisibleMoreCommands] = useState(false);
+  const [showAllCommands, setShowAllCommands] = useState(false);
 
-  const onSetIsVisibleMoreCommands = () => setIsVisibleMoreCommands(!isVisibleMoreCommands);
+  const roleName = useMemo(() => {
+    const code = user?.roleCode;
+    if (!code) return '';
+    return (
+      rolesAcls.find((r: any) => r.id === code)?.name ||
+      Roles.find((r: any) => r.id === code)?.name ||
+      ''
+    );
+  }, [rolesAcls, user?.roleCode]);
 
-  const lastCommand = orderBy(
-    (user?.commands || []).filter((command) => command?.id !== user?.initialCommand?.id),
-    'updateAt',
-    'desc',
-  )?.[0];
+  const dropdownItems = useMemo(
+    () => [
+      {
+        label: (
+          <Link to="/profile" style={{ color: '#000' }}>
+            <div style={{ padding: '.4em 0' }}>Perfil</div>
+          </Link>
+        ),
+        key: 'profile',
+      },
+      {
+        label: (
+          <div onClick={() => onLogout()} style={{ padding: '.4em 0', color: 'red' }}>
+            Cerrar sesión
+          </div>
+        ),
+        key: 'logout',
+      },
+    ],
+    [onLogout],
+  );
 
-  const items = [
-    {
-      label: (
-        <Link to="/profile" style={{ color: '#000' }}>
-          <div style={{ padding: '.4em 0' }}>Perfil</div>
-        </Link>
-      ),
-      key: '1',
-    },
-    {
-      label: (
-        <div onClick={() => onLogout()} style={{ padding: '.4em 0', color: 'red' }}>
-          Cerrar sesion
-        </div>
-      ),
-      key: '3',
-    },
-  ];
+  const contentStyle = useMemo(
+    () => ({
+      backgroundColor: token.colorBgElevated,
+      borderRadius: token.borderRadiusLG,
+      boxShadow: token.boxShadowSecondary,
+    }),
+    [token],
+  );
 
-  const contentStyle = {
-    backgroundColor: token.colorBgElevated,
-    borderRadius: token.borderRadiusLG,
-    boxShadow: token.boxShadowSecondary,
-  };
+  const profileImg = user?.profilePhoto?.thumbUrl || '/logo-not-found.png';
 
   return (
     <HeaderContainer>
       <div className="right-item">
         <Space align="center" className="items-wrapper">
-          <div
-            style={{ fontSize: '1.7em', display: 'flex', alignItems: 'center' }}
-            onClick={() => setIsVisibleDrawer(!isVisibleDrawer)}
-          >
+          <div className="btn-menu" onClick={() => setIsVisibleDrawer(!isVisibleDrawer)}>
             <FontAwesomeIcon icon={faBars} className="icon-item" />
           </div>
+
           <div>
             <img
-              src={currentCommand?.logoImgUrl || LogoPrimary}
+              src="/logo-iciproperu.png"
               width={40}
-              alt="Korekenke"
+              alt="Logo"
               onClick={() => onNavigateTo('/home')}
               className="logo-img"
             />
           </div>
-          <div onClick={() => onNavigateTo('/home')}>
-            <h3
-              style={{
-                textTransform: 'uppercase',
-                fontWeight: 'bold',
-                margin: '0',
-              }}
-            >
-              {currentCommand?.code}
-            </h3>
+
+          <div onClick={() => onNavigateTo('/home')} className="command-title">
+            <h3>Testeando</h3>
           </div>
         </Space>
       </div>
-      <div className="user-items">
-        <Dropdown
-          trigger={['click']}
-          menu={{ items }}
-          open={openDropdown}
-          onOpenChange={onOpenDropdown}
-          dropdownRender={(menu) => (
-            <div style={contentStyle}>
-              {lastCommand && (
-                <>
-                  <ItemDefaultCommand>
-                    {!isVisibleMoreCommands ? (
-                      <>
-                        <div className="wrapper-default-commands">
-                          <div className="selected-command item-command">
-                            <img
-                              src={user?.profilePhoto?.thumbUrl || PhotoNoFound}
-                              alt="Comando seleccionado"
-                            />
-                            <div className="text-command">
-                              <span>
-                                <strong>{currentCommand?.name}</strong>
-                              </span>
-                              <span>
-                                <strong>{currentCommand?.code}</strong>
-                              </span>
-                            </div>
-                          </div>
-                          <div className="last-command item-command">
-                            <div
-                              className="item-img"
-                              onClick={() => onChangeDefaultCommand(lastCommand)}
-                            >
-                              <FontAwesomeIcon
-                                icon={faArrowsRotate}
-                                type="light"
-                                className="icon-rotate"
-                              />
-                              <img src={lastCommand.logoImgUrl} alt="Comando seleccionado" />
-                            </div>
-                            <div className="text-command">
-                              <span>
-                                <strong>{lastCommand.name}</strong>
-                              </span>
-                              <span>
-                                <strong>{lastCommand.code}</strong>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="item-show-more-commands">
-                          <span onClick={() => onSetIsVisibleMoreCommands(false)}>
-                            Ver todos los comandos
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="wrapper-go-back">
-                          <span onClick={() => onSetIsVisibleMoreCommands()}>
-                            <FontAwesomeIcon icon={faArrowLeft} /> Regresar
-                          </span>
-                        </div>
-                        <div className="wrapper-more-commands">
-                          <ul>
-                            {(orderBy(user?.commands, 'updateAt', 'desc') || []).map(
-                              (command, index) => (
-                                <li
-                                  key={index}
-                                  className="item-command"
-                                  onClick={() => {
-                                    onChangeDefaultCommand(command);
-                                    onSetIsVisibleMoreCommands();
-                                  }}
-                                >
-                                  <img src={command.logoImgUrl} alt="Comando seleccionado" />
-                                  <div className="text-command">
-                                    <span>
-                                      <strong>{command.name}</strong>
-                                    </span>
-                                    <span>
-                                      <strong>{command.code}</strong>
-                                    </span>
-                                  </div>
-                                </li>
-                              ),
-                            )}
-                          </ul>
-                        </div>
-                      </>
-                    )}
-                  </ItemDefaultCommand>
-                  <Divider
-                    style={{
-                      margin: 0,
-                    }}
-                  />
-                </>
-              )}
-              {cloneElement(menu, {
-                style: {
-                  boxShadow: 'none',
-                },
-              })}
-            </div>
-          )}
-        >
-          <Space key="user-avatar" align="center" style={{ lineHeight: '1em' }}>
-            {!isMobile && (
-              <span>
-                <h4 className="capitalize">{capitalize(userFullName(user) || '')}</h4>
-                <span className="capitalize">
-                  (
-                  {rolesAcls.find((roleAcl) => roleAcl.id === user.roleCode)?.name ||
-                    Roles.find((roleAcl) => roleAcl.id === user?.roleCode)?.name ||
-                    ''}
-                  )
-                </span>
-              </span>
-            )}
-            <img src={user?.profilePhoto?.thumbUrl || PhotoNoFound} alt="user" />
-          </Space>
-        </Dropdown>
-      </div>
+
+      <div className="user-items"></div>
     </HeaderContainer>
   );
 };
+
+/** styles (los tuyos, casi igual) */
 
 const ItemDefaultCommand = styled.div`
   width: 23.8em;
@@ -333,6 +223,7 @@ const ItemDefaultCommand = styled.div`
       cursor: pointer;
     }
   }
+
   .wrapper-more-commands {
     ul {
       list-style: none;
@@ -389,6 +280,12 @@ const HeaderContainer = styled(Header)`
   overflow: hidden;
   padding: 0 16px;
 
+  .btn-menu {
+    font-size: 1.7em;
+    display: flex;
+    align-items: center;
+  }
+
   .right-item {
     display: flex;
     align-items: center;
@@ -401,6 +298,12 @@ const HeaderContainer = styled(Header)`
       .icon-item {
         margin-right: 1em;
       }
+    }
+
+    .command-title h3 {
+      text-transform: uppercase;
+      font-weight: bold;
+      margin: 0;
     }
   }
 

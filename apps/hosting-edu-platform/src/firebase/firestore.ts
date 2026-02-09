@@ -3,20 +3,26 @@ import type {
   DocumentReference,
   DocumentSnapshot,
   Query,
+  QueryConstraint,
   QuerySnapshot,
+  WhereFilterOp,
 } from 'firebase/firestore';
 import {
   arrayRemove,
   arrayUnion,
+  collection,
   deleteDoc,
   deleteField,
+  doc,
   getDoc,
   getDocs,
   increment,
+  query,
   serverTimestamp,
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 
 export const firestoreTimestamp = Timestamp;
@@ -36,6 +42,16 @@ export const firestoreFieldValue = {
 
 export const DATE_FORMAT_TO_FIRESTORE = 'DD/MM/YYYY HH:mm';
 
+type ObjectType = { [field: string]: any };
+
+type NestedKeyOf<ObjectType extends object> = {
+  [Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends object
+    ? `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
+    : `${Key}`;
+}[keyof ObjectType & (string | number)];
+
+export type WhereClauses<T extends ObjectType> = [NestedKeyOf<T>, WhereFilterOp, unknown];
+
 /**
  * Convierte QuerySnapshot a array agregando id.
  */
@@ -47,6 +63,22 @@ export const querySnapshotToArray = <T extends DocumentData>(querySnapshot: Quer
   });
 
   return documents;
+};
+
+export const fetchCollection = async <T extends DocumentData>(
+  baseQuery: Query<T>,
+  whereClauses?: WhereClauses<T>[],
+): Promise<Array<T & { id: string }>> => {
+  const constraints: QueryConstraint[] =
+    whereClauses?.map(([field, operation, value]) =>
+      where(field as string, operation as any, value),
+    ) || [];
+
+  const finalQuery = query(baseQuery, ...constraints);
+
+  const querySnapshot = await getDocs(finalQuery);
+
+  return querySnapshotToArray<T>(querySnapshot);
 };
 
 /**
@@ -61,7 +93,7 @@ export const fetchCollectionOnce = async <T extends DocumentData>(query: Query<T
  * Trae un documento (DocumentReference) una sola vez.
  */
 export const fetchDocumentOnce = async <T extends DocumentData>(
-  documentReference: DocumentReference<T>,
+  documentReference: DocumentReference<any>,
 ) => {
   const documentSnapshot: DocumentSnapshot<T> = await getDoc(documentReference);
   return documentSnapshot.exists() ? documentSnapshot.data() : undefined;
@@ -71,7 +103,7 @@ export const fetchDocumentOnce = async <T extends DocumentData>(
  * setDoc por defecto (sobrescribe el doc completo).
  */
 export const setDocument = async <T extends DocumentData>(
-  docRef: DocumentReference<T>,
+  docRef: DocumentReference<any>,
   document: T,
 ) => setDoc(docRef, document);
 
@@ -96,3 +128,19 @@ export const mergeDocument = async <T extends DocumentData>(
  */
 export const deleteDocument = async <T extends DocumentData>(docRef: DocumentReference<T>) =>
   deleteDoc(docRef);
+
+export {
+  doc,
+  collection,
+  arrayRemove,
+  arrayUnion,
+  deleteDoc,
+  deleteField,
+  getDoc,
+  getDocs,
+  increment,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+};
