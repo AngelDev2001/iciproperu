@@ -118,9 +118,8 @@ export function FooterLayout() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>© {currentYear} ICIPRO Perú. Todos los derechos reservados.</p>
+          <p>© 2023 - {currentYear} ICIPRO Perú. Todos los derechos reservados.</p>
           <div className="flex gap-6">
             <Link href="#" className="hover:underline">
               Términos
@@ -128,9 +127,6 @@ export function FooterLayout() {
             <Link href="#" className="hover:underline">
               Privacidad
             </Link>
-            <p>
-              Powered by <span className="font-semibold">VilanuevaStudioWeb</span>
-            </p>
           </div>
         </div>
       </ContentWidth>
