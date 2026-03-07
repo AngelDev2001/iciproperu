@@ -4,9 +4,9 @@ node_modules
 .pnp.js
 
 # builds de cada app
-apps/hosting/.next
-apps/hosting/out
-apps/hosting/.turbo
+apps/web/.next
+apps/web/out
+apps/web/.turbo
 
 apps/hosting-edu-platform/dist
 apps/hosting-edu-platform/.turbo
