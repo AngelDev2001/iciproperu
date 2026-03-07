@@ -50,7 +50,7 @@ importers:
         version: 2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)
       firebase-functions-test:
         specifier: ^3.1.0
-        version: 3.4.1(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(jest@30.2.0(@types/node@24.10.9))
+        version: 3.4.1(firebase-admin@12.7.0)(firebase-api@6.6.0(firebase-admin@12.7.0))(jest@30.2.0(@types/node@24.10.9))
       typescript:
         specifier: ^5.7.3
         version: 5.9.3

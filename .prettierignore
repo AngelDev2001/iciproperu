@@ -11,9 +11,9 @@ apps/web/.turbo
 apps/hosting-edu-platform/dist
 apps/hosting-edu-platform/.turbo
 
-apps/functions/lib
-apps/functions/dist
-apps/functions/.turbo
+apps/api/lib
+apps/api/dist
+apps/api/.turbo
 
 # firebase
 .firebase
