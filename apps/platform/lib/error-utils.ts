@@ -1,10 +1,10 @@
-import errors from "./i18n/errors.json";
+import errors from './i18n/errors.json';
 
 type ErrorDoc = typeof errors;
 
 export const getErrorMessage = (
   code: string,
-  params?: { min?: number | string; max?: number | string; field?: string }
+  params?: { min?: number | string; max?: number | string; field?: string },
 ): string => {
   const field = params?.field;
 
@@ -16,15 +16,18 @@ export const getErrorMessage = (
   }
 
   const genericErrors = errors.generic as Record<string, string>;
-  const message = genericErrors[code] || genericErrors["invalid_format"];
+  const message = genericErrors[code] || genericErrors['invalid_format'];
 
   return parseMessage(message, params);
 };
 
 const parseMessage = (msg: string, params?: any): string => {
   if (!params) return msg;
+
+  const fieldLabel = (errors as any).labels?.[params.field] || params.field || 'campo';
+
   return msg
-    .replace("{{min}}", String(params.min ?? ""))
-    .replace("{{max}}", String(params.max ?? ""))
-    .replace("{{field}}", String(params.field ?? ""));
+    .replace('{{min}}', String(params.min ?? ''))
+    .replace('{{max}}', String(params.max ?? ''))
+    .replace('{{field}}', fieldLabel);
 };

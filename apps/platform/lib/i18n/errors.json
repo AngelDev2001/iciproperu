@@ -13,5 +13,10 @@
     "phoneNumber": {
       "too_small": "El celular debe tener 9 dígitos"
     }
+  },
+  "labels": {
+    "document_number": "Número de documento",
+    "first_names": "Nombres",
+    "last_names": "Apellidos"
   }
 }
