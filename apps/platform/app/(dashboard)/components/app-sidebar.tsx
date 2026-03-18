@@ -23,9 +23,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { NavMain } from '@/app/(dashboard)/components/nav-main';
-import { NavSecondary } from '@/app/(dashboard)/components/nav-secondary';
-import { NavUser } from '@/app/(dashboard)/components/nav-user';
+import {NavMain} from '@/app/(dashboard)/components/nav-main';
+import {NavSecondary} from '@/app/(dashboard)/components/nav-secondary';
+import {NavUser} from '@/app/(dashboard)/components/nav-user';
 import Link from 'next/link';
 
 const data = {
@@ -47,13 +47,37 @@ const data = {
       items: [
         {
           title: 'Usuarios',
-          url: '/',
+          url: '#',
           icon: IconUsers,
+          items: [
+            {
+              title: 'Crear',
+              url: '/users/create',
+              icon: IconPlus,
+            },
+            {
+              title: 'Lista',
+              url: '/users',
+              icon: IconList,
+            },
+          ],
         },
         {
           title: 'Roles y Permisos',
           url: '/',
           icon: IconShieldCheck,
+          items: [
+            {
+              title: 'Crear',
+              url: '/roles/create',
+              icon: IconPlus,
+            },
+            {
+              title: 'Lista',
+              url: '/roles',
+              icon: IconList,
+            },
+          ],
         },
       ],
     },
@@ -64,12 +88,12 @@ const data = {
       items: [
         {
           title: 'Crear',
-          url: '/',
+          url: '/courses/create',
           icon: IconPlus,
         },
         {
           title: 'Lista',
-          url: '/',
+          url: '/courses',
           icon: IconList,
         },
       ],
@@ -93,20 +117,8 @@ const data = {
     },
     {
       title: 'Certificados',
-      url: '#',
+      url: '/certificates',
       icon: IconAward,
-      items: [
-        {
-          title: 'Crear',
-          url: '/',
-          icon: IconPlus,
-        },
-        {
-          title: 'Lista',
-          url: '/',
-          icon: IconList,
-        },
-      ],
     },
   ],
   navClouds: [],
