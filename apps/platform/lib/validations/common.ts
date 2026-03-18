@@ -1,7 +1,7 @@
-import * as z from "zod";
+import * as z from 'zod';
 
 export const documentSchema = z.object({
-  type: z.enum(["dni", "ruc"]),
+  type: z.enum(['dni', 'ruc']),
   number: z.string().min(8).max(11),
 });
 
@@ -10,7 +10,15 @@ export const phoneSchema = z.object({
   number: z.string().length(9).regex(/^9/),
 });
 
-export const optionalString = z.string().optional().or(z.literal(""));
+export const optionalString = z.string().optional().or(z.literal(''));
 
 // export type Document = z.infer<typeof documentSchema>;
 // export type Phone = z.infer<typeof phoneSchema>;
+
+export const auditSchema = z.object({
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+  created_by: z.string().uuid().optional(),
+  updated_by: z.string().uuid().optional(),
+  is_deleted: z.boolean().default(false),
+});
