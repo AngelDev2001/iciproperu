@@ -1,196 +1,307 @@
-"use client"
+'use client';
 
-import {useRouter} from "next/navigation"
-import {useForm} from "react-hook-form"
-import {zodResolver} from "@hookform/resolvers/zod"
-import * as z from "zod"
+import * as React from 'react';
+import { useRouter } from 'next/navigation';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import {
+  BookOpen,
+  ClipboardCheck,
+  Clock,
+  FileBadge2,
+  GraduationCap,
+  IdCard,
+  Plus,
+  Send,
+  Trash2,
+  User,
+} from 'lucide-react';
 
-import {Button} from "@/components/ui/button"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {Textarea} from "@/components/ui/textarea"
-import {ArrowLeft, BookOpen, FileText, Fingerprint, Send, User} from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormField } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectItem } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 
-const requestSchema = z.object({
-    studentName: z.string().min(3, "Nombre completo requerido"),
-    dni: z.string().length(8, "El DNI debe tener 8 dígitos"),
-    email: z.string().email("Email inválido"),
-    courseId: z.string().min(1, "Selecciona un curso"),
-    phone: z.string().min(9, "Teléfono inválido"),
-    additionalNotes: z.string().optional(),
-})
+import { useFormHelpers } from '@/lib/hooks/useFormHelpers';
+import {
+  type CertificateRequest,
+  certificateRequestSchema,
+} from '@/lib/validations/certificates-request';
+import { userSchema } from '@/lib/validations/user';
 
 export default function NewCertificateRequestPage() {
-    const router = useRouter()
+  const router = useRouter();
+  const [isPending, setIsPending] = React.useState(false);
 
-    const form = useForm<z.infer<typeof requestSchema>>({
-        resolver: zodResolver(requestSchema),
-        defaultValues: {
-            studentName: "",
-            dni: "",
-            email: "",
-            courseId: "",
-            phone: "",
-            additionalNotes: ""
-        },
-    })
+  const form = useForm<CertificateRequest>({
+    resolver: zodResolver(certificateRequestSchema),
+    defaultValues: {
+      status: 'pending',
+      document_type: 'DNI',
+      course_hours: 40,
+      grades: [{ topic: '', score: 14 }], // Valor inicial para el primer tema
+      is_deleted: false,
+    },
+  });
 
-    function onSubmit(values: z.infer<typeof requestSchema>) {
-        console.log("Enviando solicitud de trámite:", values)
-        // Lógica para guardar la solicitud con estado 'pendiente'
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'grades',
+  });
+
+  async function onSubmit(values: CertificateRequest) {
+    setIsPending(true);
+    try {
+      console.log('Enviando a Supabase:', values);
+      // const result = await createCertificateRequest(values);
+      toast.success('Solicitud enviada correctamente');
+      router.push('/administration/certificates');
+    } catch (error) {
+      toast.error('Error al procesar la solicitud');
+    } finally {
+      setIsPending(false);
     }
+  }
 
-    return (
-        <div className="flex-1 space-y-6 p-8 pt-6">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={() => router.back()}>
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    <h2 className="text-3xl font-bold tracking-tight">Nueva Solicitud</h2>
+  return (
+    <div className="space-y-8 p-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Crear Nueva Solicitud</h1>
+        <p className="text-muted-foreground text-lg">
+          Inicia el proceso de certificación registrando los datos del alumno y sus calificaciones.
+        </p>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              <CardTitle>Información del Estudiante</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="document_type"
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      {...useFormHelpers('document_type', certificateRequestSchema)}
+                      label="Tipo Documento"
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      icon={FileBadge2}
+                    >
+                      <SelectItem value="DNI">DNI</SelectItem>
+                      <SelectItem value="CE">CE</SelectItem>
+                      <SelectItem value="PASSPORT">Pasaporte</SelectItem>
+                    </Select>
+                  )}
+                />
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="document_number"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        {...useFormHelpers('document_number', certificateRequestSchema)}
+                        label="Número de Documento"
+                        placeholder="Ingrese el número de identidad"
+                        icon={IdCard}
+                      />
+                    )}
+                  />
                 </div>
-            </div>
+              </div>
 
-            <Card className="w-full">
-                <CardHeader className="border-b mb-6">
-                    <div className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-primary" />
-                        <CardTitle>Formulario de Trámite de Certificación</CardTitle>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="first_names"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      {...useFormHelpers('first_names', userSchema)}
+                      label="Nombres"
+                      placeholder="Ej. Juan"
+                      icon={User}
+                    />
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="paternal_surname"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      {...useFormHelpers('paternal_surname', userSchema)}
+                      label="Apellido Paterno"
+                      placeholder="Ej. Pérez"
+                      icon={User}
+                    />
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="maternal_surname"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      {...useFormHelpers('maternal_surname', userSchema)}
+                      label="Apellido Materno"
+                      placeholder="Ej. Ramos"
+                      icon={User}
+                    />
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-primary" />
+              <CardTitle>Detalles Académicos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="md:col-span-3">
+                  <FormField
+                    control={form.control}
+                    name="course_name"
+                    render={({ field }) => (
+                      <Input {...field} label="Nombre del Curso" icon={BookOpen} />
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="course_hours"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="number"
+                      label="Horas"
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      icon={Clock}
+                    />
+                  )}
+                />
+              </div>
+
+              <Separator className="bg-primary/10" />
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    <ClipboardCheck className="w-4 h-4" /> Temarios y Calificaciones
+                  </h4>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => append({ topic: '', score: 14 })}
+                    className="h-8 gap-1"
+                  >
+                    <Plus className="w-4 h-4" /> Agregar Tema
+                  </Button>
+                </div>
+
+                {fields.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end animate-in fade-in slide-in-from-top-1"
+                  >
+                    <div className="md:col-span-8">
+                      <FormField
+                        control={form.control}
+                        name={`grades.${index}.topic`}
+                        render={({ field }) => (
+                          <Input {...field} placeholder="Nombre del tema o módulo" />
+                        )}
+                      />
                     </div>
-                    <CardDescription>
-                        Completa los datos del participante para iniciar el proceso de emisión.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <div className="md:col-span-3">
+                      <FormField
+                        control={form.control}
+                        name={`grades.${index}.score`}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            type="number"
+                            placeholder="Nota"
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        )}
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(index)}
+                        className="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                        disabled={fields.length === 1}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {/* Nombre del Alumno */}
-                                <FormField
-                                    control={form.control}
-                                    name="studentName"
-                                    render={({ field }) => (
-                                        <FormItem className="col-span-1 md:col-span-2">
-                                            <FormLabel className="flex items-center gap-2">
-                                                <User className="h-3.5 w-3.5" /> Nombres y Apellidos
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Tal como aparecerá en el certificado" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Observaciones Internas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="internal_observations"
+                render={({ field }) => (
+                  <Textarea
+                    {...field}
+                    placeholder="Notas adicionales para gerencia..."
+                    className="min-h-[100px] bg-muted/5"
+                  />
+                )}
+              />
+            </CardContent>
+          </Card>
 
-                                {/* DNI */}
-                                <FormField
-                                    control={form.control}
-                                    name="dni"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="flex items-center gap-2">
-                                                <Fingerprint className="h-3.5 w-3.5" /> DNI
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="8 dígitos" maxLength={8} {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Email */}
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Correo Electrónico de contacto</FormLabel>
-                                            <FormControl>
-                                                <Input type="email" placeholder="ejemplo@correo.com" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {/* Teléfono */}
-                                <FormField
-                                    control={form.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Número de Celular (WhatsApp)</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="999 999 999" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            {/* Selección de Curso */}
-                            <FormField
-                                control={form.control}
-                                name="courseId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="flex items-center gap-2">
-                                            <BookOpen className="h-3.5 w-3.5" /> Curso solicitado
-                                        </FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Selecciona el curso para el certificado" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="c1">Especialista en Gestión Pública</SelectItem>
-                                                <SelectItem value="c2">SIAF, SIGA y SEACE</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            {/* Notas Adicionales */}
-                            <FormField
-                                control={form.control}
-                                name="additionalNotes"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Observaciones adicionales (Opcional)</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                placeholder="Indique si el envío es a provincia, si requiere duplicado, etc."
-                                                className="resize-none"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <div className="flex justify-end gap-4 border-t pt-6">
-                                <Button variant="ghost" type="button" onClick={() => router.back()}>
-                                    Descartar
-                                </Button>
-                                <Button type="submit" className="bg-primary px-10">
-                                    <Send className="mr-2 h-4 w-4" /> Enviar Solicitud
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
-        </div>
-    )
+          {/* BOTONES DE ACCIÓN */}
+          <div className="flex justify-end items-center gap-4 pt-4">
+            <Button
+              size="lg"
+              variant="outline"
+              type="button"
+              className="px-8"
+              disabled={isPending}
+              onClick={() => router.back()}
+            >
+              Cancelar
+            </Button>
+            <Button size="lg" type="submit" disabled={isPending} className="px-10 gap-2">
+              {isPending ? (
+                'Enviando...'
+              ) : (
+                <>
+                  <Send className="w-4 h-4" /> Enviar Solicitud
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
 }
