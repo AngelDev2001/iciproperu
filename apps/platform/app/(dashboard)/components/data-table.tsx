@@ -83,13 +83,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectItem } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -257,24 +251,18 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       }
 
       return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-            </SelectContent>
-          </Select>
-        </>
+        <Select
+          defaultValue={row.original.reviewer}
+          placeholder="Assign reviewer"
+          className="w-48"
+          onValueChange={(value) => {
+            // Aquí tu lógica de actualización
+            toast.success(`Reviewer asignado: ${value}`);
+          }}
+        >
+          <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
+          <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
+        </Select>
       );
     },
   },
@@ -390,16 +378,11 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
         <Label htmlFor="view-selector" className="sr-only">
           View
         </Label>
-        <Select defaultValue="outline">
-          <SelectTrigger className="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
-          </SelectContent>
+        <Select defaultValue="outline" className="w-fit @4xl/main:hidden" triggerClassName="h-8">
+          <SelectItem value="outline">Outline</SelectItem>
+          <SelectItem value="past-performance">Past Performance</SelectItem>
+          <SelectItem value="key-personnel">Key Personnel</SelectItem>
+          <SelectItem value="focus-documents">Focus Documents</SelectItem>
         </Select>
         <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
           <TabsTrigger value="outline">Outline</TabsTrigger>
@@ -503,20 +486,15 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
               </Label>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value));
-                }}
+                onValueChange={(value) => table.setPageSize(Number(value))}
+                className="w-20"
+                triggerClassName="h-8"
               >
-                <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                  <SelectValue placeholder={table.getState().pagination.pageSize} />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
               </Select>
             </div>
             <div className="flex w-fit items-center justify-center text-sm font-medium">
@@ -675,33 +653,23 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="type">Type</Label>
-                <Select defaultValue={item.type}>
-                  <SelectTrigger id="type" className="w-full">
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Table of Contents">Table of Contents</SelectItem>
-                    <SelectItem value="Executive Summary">Executive Summary</SelectItem>
-                    <SelectItem value="Technical Approach">Technical Approach</SelectItem>
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Capabilities">Capabilities</SelectItem>
-                    <SelectItem value="Focus Documents">Focus Documents</SelectItem>
-                    <SelectItem value="Narrative">Narrative</SelectItem>
-                    <SelectItem value="Cover Page">Cover Page</SelectItem>
-                  </SelectContent>
+                <Select label="Type" defaultValue={item.type}>
+                  <SelectItem value="Table of Contents">Table of Contents</SelectItem>
+                  <SelectItem value="Executive Summary">Executive Summary</SelectItem>
+                  <SelectItem value="Technical Approach">Technical Approach</SelectItem>
+                  <SelectItem value="Design">Design</SelectItem>
+                  <SelectItem value="Capabilities">Capabilities</SelectItem>
+                  <SelectItem value="Focus Documents">Focus Documents</SelectItem>
+                  <SelectItem value="Narrative">Narrative</SelectItem>
+                  <SelectItem value="Cover Page">Cover Page</SelectItem>
                 </Select>
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Done">Done</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
-                  </SelectContent>
+                <Select label="Status" defaultValue={item.status}>
+                  <SelectItem value="Done">Done</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Not Started">Not Started</SelectItem>
                 </Select>
               </div>
             </div>
@@ -717,15 +685,10 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Select a reviewer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                  <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-                  <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
-                </SelectContent>
+              <Select label="Reviewer" defaultValue={item.reviewer}>
+                <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
+                <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
+                <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
               </Select>
             </div>
           </form>
