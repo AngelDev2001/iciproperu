@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { auditSchema } from '@/lib/validations/common';
+import {auditSchema} from '@/lib/validations/common';
 
 export const certificateGradeSchema = z.object({
   topic: z.string().min(1),
@@ -26,6 +26,8 @@ export const certificateRequestSchema = z
     approval_comment: z.string().optional().nullable(),
     internal_observations: z.string().optional(),
   })
-  .merge(auditSchema);
+
+export const userBdSchema = certificateRequestSchema.merge(auditSchema);
+
 
 export type CertificateRequest = z.infer<typeof certificateRequestSchema>;

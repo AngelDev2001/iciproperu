@@ -1,9 +1,53 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'; // Importación directa para el cliente admin
-import { UserFormValues, userSchema } from '@/lib/validations/user';
-import { revalidatePath } from 'next/cache';
+import {createClient} from '@/lib/supabase/server';
+import {createClient as createSupabaseClient} from '@supabase/supabase-js'; // Importación directa para el cliente admin
+import {UserFormValues, userSchema} from '@/lib/validations/user';
+import {revalidatePath} from 'next/cache';
+
+/**
+ * Obtener todos los perfiles que no han sido borrados ordenados por fecha
+ */
+export async function getUsers() {
+  const supabaseAdmin = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false }); // 'ascending: false' es descendente (recientes primero)
+
+  if (error) {
+    console.error('Error al obtener usuarios:', error);
+    return { success: false, error };
+  }
+
+  return { success: true, data: data || [] };
+}
+
+/**
+ * Obtener un único perfil por su ID
+ */
+export async function getUserById(userId: string) {
+  const supabase = await createClient();
+
+  try {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single(); // Nos asegura que devuelva un objeto, no un array
+
+    if (error) throw error;
+
+    return { success: true, data };
+  } catch (error: any) {
+    console.error('Error fetching user by ID:', error);
+    return { success: false, error: error.message };
+  }
+}
 
 /**
  * SHORTCUT: Guardar un nuevo usuario

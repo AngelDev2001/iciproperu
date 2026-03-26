@@ -9,7 +9,6 @@ import {
   IconLayoutDashboard,
   IconList,
   IconPlus,
-  IconSettings,
   IconShieldCheck,
   IconUsers,
 } from '@tabler/icons-react';
@@ -105,12 +104,12 @@ const data = {
       items: [
         {
           title: 'Crear',
-          url: '/',
+          url: '/certificate-requests/create',
           icon: IconPlus,
         },
         {
           title: 'Lista',
-          url: '/',
+          url: '/certificate-requests',
           icon: IconList,
         },
       ],
@@ -122,13 +121,7 @@ const data = {
     },
   ],
   navClouds: [],
-  navSecondary: [
-    {
-      title: 'Ajustes',
-      url: '#',
-      icon: IconSettings,
-    },
-  ],
+  navSecondary: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

@@ -1,37 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
-import {
-  BookOpen,
-  ClipboardCheck,
-  Clock,
-  FileBadge2,
-  GraduationCap,
-  IdCard,
-  Plus,
-  Send,
-  Trash2,
-  User,
-} from 'lucide-react';
+import {useRouter} from 'next/navigation';
+import {useFieldArray, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {toast} from 'sonner';
+import {BookOpen, FileBadge2, GraduationCap, IdCard, Send, User,} from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormField } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectItem } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Form, FormField} from '@/components/ui/form';
+import {Input} from '@/components/ui/input';
+import {Select, SelectItem} from '@/components/ui/select';
+import {Textarea} from '@/components/ui/textarea';
 
-import { useFormHelpers } from '@/lib/hooks/useFormHelpers';
-import {
-  type CertificateRequest,
-  certificateRequestSchema,
-} from '@/lib/validations/certificates-request';
-import { userSchema } from '@/lib/validations/user';
+import {useFormHelpers} from '@/hooks/useFormHelpers';
+import {type CertificateRequest, certificateRequestSchema,} from '@/lib/validations/certificates-request';
 
 export default function NewCertificateRequestPage() {
   const router = useRouter();
@@ -127,7 +111,7 @@ export default function NewCertificateRequestPage() {
                   render={({ field }) => (
                     <Input
                       {...field}
-                      {...useFormHelpers('first_names', userSchema)}
+                      {...useFormHelpers('first_names', certificateRequestSchema)}
                       label="Nombres"
                       placeholder="Ej. Juan"
                       icon={User}
@@ -140,7 +124,7 @@ export default function NewCertificateRequestPage() {
                   render={({ field }) => (
                     <Input
                       {...field}
-                      {...useFormHelpers('paternal_surname', userSchema)}
+                      {...useFormHelpers('paternal_surname', certificateRequestSchema)}
                       label="Apellido Paterno"
                       placeholder="Ej. Pérez"
                       icon={User}
@@ -153,7 +137,7 @@ export default function NewCertificateRequestPage() {
                   render={({ field }) => (
                     <Input
                       {...field}
-                      {...useFormHelpers('maternal_surname', userSchema)}
+                      {...useFormHelpers('maternal_surname', certificateRequestSchema)}
                       label="Apellido Materno"
                       placeholder="Ej. Ramos"
                       icon={User}
@@ -169,100 +153,18 @@ export default function NewCertificateRequestPage() {
               <GraduationCap className="w-5 h-5 text-primary" />
               <CardTitle>Detalles Académicos</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="md:col-span-3">
-                  <FormField
-                    control={form.control}
-                    name="course_name"
-                    render={({ field }) => (
-                      <Input {...field} label="Nombre del Curso" icon={BookOpen} />
-                    )}
-                  />
-                </div>
-                <FormField
+            <CardContent>
+              <FormField
                   control={form.control}
-                  name="course_hours"
+                  name="course_name"
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="number"
-                      label="Horas"
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      icon={Clock}
-                    />
+                      <Input {...field} {...useFormHelpers('course_name', certificateRequestSchema)} label="Nombre del Curso" icon={BookOpen} />
                   )}
-                />
-              </div>
-
-              <Separator className="bg-primary/10" />
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold flex items-center gap-2">
-                    <ClipboardCheck className="w-4 h-4" /> Temarios y Calificaciones
-                  </h4>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => append({ topic: '', score: 14 })}
-                    className="h-8 gap-1"
-                  >
-                    <Plus className="w-4 h-4" /> Agregar Tema
-                  </Button>
-                </div>
-
-                {fields.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end animate-in fade-in slide-in-from-top-1"
-                  >
-                    <div className="md:col-span-8">
-                      <FormField
-                        control={form.control}
-                        name={`grades.${index}.topic`}
-                        render={({ field }) => (
-                          <Input {...field} placeholder="Nombre del tema o módulo" />
-                        )}
-                      />
-                    </div>
-                    <div className="md:col-span-3">
-                      <FormField
-                        control={form.control}
-                        name={`grades.${index}.score`}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            type="number"
-                            placeholder="Nota"
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        )}
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => remove(index)}
-                        className="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
-                        disabled={fields.length === 1}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              />
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Observaciones Internas</CardTitle>
-            </CardHeader>
             <CardContent>
               <FormField
                 control={form.control}
@@ -270,6 +172,8 @@ export default function NewCertificateRequestPage() {
                 render={({ field }) => (
                   <Textarea
                     {...field}
+                    {...useFormHelpers('internal_observations', certificateRequestSchema)}
+                      label="Observaciones Internas"
                     placeholder="Notas adicionales para gerencia..."
                     className="min-h-[100px] bg-muted/5"
                   />

@@ -5,7 +5,7 @@ import {useRouter} from "next/navigation" // Importamos para redirigir
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import * as z from "zod"
-import {createClient} from "@/utils/supabase/client" // Tu cliente de navegador
+import {createClient} from "@/lib/supabase/client" // Tu cliente de navegador
 import {Button} from "@/components/ui/button"
 import {Card, CardContent} from "@/components/ui/card"
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form"
