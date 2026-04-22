@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: 'https://iciproperu-web.vercel.app/og-image.png',
         width: 1200,
         height: 630,
         alt: 'ICIPRO PERÚ - Instituto de Capacitación',
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ICIPRO PERÚ',
     description: 'Capacitación profesional certificada en Santa Rosa de Lima.',
-    images: ['/og-image.png'],
+    images: ['https://iciproperu-web.vercel.app/og-image.png'],
   },
   robots: {
     index: true,
