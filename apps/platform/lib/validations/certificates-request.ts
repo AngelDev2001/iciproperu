@@ -19,7 +19,7 @@ export const certificateRequestSchema = z
     course_name: z.string(),
     course_hours: z.number().int().positive().optional(),
     grades: z.array(certificateGradeSchema).optional(),
-    status: z.enum(['pending', 'approved', 'rejected']).default('pending'),
+    status: z.enum(['pending', 'approved', 'rejected']),
     certificate_code: z.string().optional().nullable(),
     approved_by: z.string().uuid().optional().nullable(),
     approved_at: z.string().optional().nullable(),

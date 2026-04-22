@@ -26,9 +26,14 @@ export default function NewCertificateRequestPage() {
     defaultValues: {
       status: 'pending',
       document_type: 'DNI',
+      document_number: '',
+      first_names: '',
+      paternal_surname: '',
+      maternal_surname: '',
+      course_name: '',
+      internal_observations: '',
       course_hours: 40,
-      grades: [{ topic: '', score: 14 }], // Valor inicial para el primer tema
-      is_deleted: false,
+      grades: [{ topic: '', score: 14 }],
     },
   });
 
@@ -182,7 +187,6 @@ export default function NewCertificateRequestPage() {
             </CardContent>
           </Card>
 
-          {/* BOTONES DE ACCIÓN */}
           <div className="flex justify-end items-center gap-4 pt-4">
             <Button
               size="lg"
