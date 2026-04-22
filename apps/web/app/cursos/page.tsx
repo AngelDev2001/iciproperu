@@ -1,19 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ContentWidth } from '@/components/ContentWidth';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Clock, Funnel, GraduationCap, MagnifyingGlass, User } from '@phosphor-icons/react';
+import React, {useState} from 'react';
+import {ContentWidth} from '@/components/ContentWidth';
+import {Card, CardContent} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Badge} from '@/components/ui/badge';
+import {Button} from '@/components/ui/button';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from '@/components/ui/accordion';
+import {Clock, Funnel, GraduationCap, MagnifyingGlass, User} from '@phosphor-icons/react';
+import {_Hero} from "@/sections/_Hero";
 
 const coursesData = [
   {
@@ -71,18 +67,15 @@ export default function CoursesPage() {
   return (
     <section>
       <div className="bg-white min-h-screen pb-20">
-        <section className="py-12 border-b border-border bg-gray-50/50 mb-12">
-          <ContentWidth>
-            <div className="text-center">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3 uppercase">
-                Catálogo de cursos y diplomados
-              </h1>
-            </div>
-          </ContentWidth>
-        </section>
+
+        <_Hero
+            image="/courses-hero.png"
+            imageAlt=""
+            title="Domina las competencias del mañana"
+            description="Programas de especialización diseñados y liderados por expertos globales. Adquiere las habilidades técnicas que las empresas líderes demandan hoy." />
 
         <ContentWidth>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start py-20">
             <aside className="lg:col-span-3 space-y-6">
               <div className="p-6 border border-border rounded-lg bg-white shadow-sm">
                 <div className="flex items-center gap-3 mb-6">

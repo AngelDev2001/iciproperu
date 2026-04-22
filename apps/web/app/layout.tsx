@@ -40,13 +40,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ICIPRO PERÚ | Educación Profesional de Alto Impacto',
     description: 'Transforma tu carrera con nuestras especializaciones y diplomados certificados.',
-    url: 'https://iciproperu.com/',
+    url: 'https://iciproperu-web.vercel.app/',
     siteName: 'ICIPRO PERÚ',
     locale: 'es_PE',
     type: 'website',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'ICIPRO PERÚ - Instituto de Capacitación',

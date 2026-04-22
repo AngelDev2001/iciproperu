@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { BadgeCheck, Loader, Search, ShieldCheck } from 'lucide-react';
-import { ContentWidth } from '@/components/ContentWidth';
+import React, {useState} from 'react';
+import {Input} from '@/components/ui/input';
+import {Button} from '@/components/ui/button';
+import {motion} from 'framer-motion';
+import {Certificate, MagnifyingGlass, SealCheck, SpinnerGap} from '@phosphor-icons/react';
+import {ContentWidth} from '@/components/ContentWidth';
 
 export function CertificateVerification() {
   const [isVerifying, setIsVerifying] = useState(false);
@@ -27,7 +27,7 @@ export function CertificateVerification() {
             className="flex justify-center mb-6"
           >
             <div className="relative">
-              <BadgeCheck size={64} className="text-primary" />
+              <SealCheck size={64} weight="duotone" className="text-primary" />
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
@@ -46,11 +46,10 @@ export function CertificateVerification() {
             digital.
           </p>
 
-          {/* Formulario de Búsqueda */}
           <form onSubmit={handleVerify} className="relative group max-w-2xl mx-auto">
             <div className="relative flex items-center">
               <div className="absolute left-4 text-muted-foreground group-focus-within:text-primary transition-colors">
-                <Search size={20} />
+                <MagnifyingGlass size={20} weight="bold" />
               </div>
 
               <Input
@@ -66,14 +65,14 @@ export function CertificateVerification() {
                   disabled={isVerifying}
                   className="h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all active:scale-95 disabled:opacity-70"
                 >
-                  {isVerifying ? <Loader className="animate-spin" size={20} /> : 'Verificar'}
+                  {isVerifying ? <SpinnerGap className="animate-spin" size={20} weight="bold" /> : 'Verificar'}
                 </Button>
               </div>
             </div>
           </form>
 
           <p className="mt-6 text-xs text-muted-foreground flex items-center justify-center gap-2">
-            <ShieldCheck size={16} />
+            <Certificate size={16} />
             ID de ejemplo: ICIPRO-2026-XXXX
           </p>
         </div>

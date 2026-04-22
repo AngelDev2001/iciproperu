@@ -8,9 +8,9 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ContentWidth } from '@/components/ContentWidth';
+import {Button} from '@/components/ui/button';
+import {cn} from '@/lib/utils';
+import {ContentWidth} from '@/components/ContentWidth';
 
 const navItems = [
   { title: 'Inicio', href: '/' },
@@ -34,9 +34,6 @@ export function Header() {
                 priority
                 className="object-contain"
               />
-              <span className="hidden font-bold text-primary sm:inline-block text-xl tracking-tight">
-                ICIPRO
-              </span>
             </Link>
           </div>
 

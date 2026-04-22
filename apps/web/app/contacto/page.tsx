@@ -1,17 +1,12 @@
 'use client';
 
 import React from 'react';
-import {
-  Clock,
-  EnvelopeSimple,
-  MapPinLine,
-  PaperPlaneTilt,
-  WhatsappLogo,
-} from '@phosphor-icons/react';
-import { ContentWidth } from '@/components/ContentWidth';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import {Clock, EnvelopeSimple, MapPinLine, PaperPlaneTilt, WhatsappLogo,} from '@phosphor-icons/react';
+import {ContentWidth} from '@/components/ContentWidth';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
+import {Button} from '@/components/ui/button';
+import {_Hero} from "@/sections/_Hero";
 
 export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,6 +15,13 @@ export default function ContactPage() {
 
   return (
     <div className="bg-white min-h-screen">
+
+      <_Hero
+          image="/contact-hero.png"
+          imageAlt=""
+          title="Impulsa tu futuro hoy mismo"
+          description="Estamos listos para guiarte en tu próximo paso profesional. Déjanos un mensaje y diseñemos juntos tu camino hacia la excelencia." />
+
       <section className="py-12 border-b border-border">
         <ContentWidth>
           <div className="max-w-2xl">
