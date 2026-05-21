@@ -40,11 +40,11 @@ export default function NewCoursePage() {
     };
 
     return (
-        <CourseForm onSubmit={onSubmit} isPending={isPending} />
+        <CourseForm onSubmit={onSubmit} isPending={isPending} router={router} />
     );
 }
 
-const CourseForm = ({onSubmit, isPending}: any) => {
+const CourseForm = ({onSubmit, isPending, router}: any) => {
 
     const form = useForm<Course>({
         resolver: zodResolver(courseSchema) as any,
