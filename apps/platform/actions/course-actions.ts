@@ -3,19 +3,16 @@
 import {createClient} from '@/lib/supabase/server';
 import {Course, courseSchema} from '@/lib/validations/course';
 import {revalidatePath} from 'next/cache';
+import {assignCreateProps, assignDeleteProps, assignUpdateProps} from '@/lib/utils/audit';
 
-/**
- * Función auxiliar para subir la imagen al Storage de Supabase
- */
+
 async function uploadImage(file: File) {
     const supabase = await createClient();
 
-    // Generar un nombre único para el archivo
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
     const filePath = `course-covers/${fileName}`;
 
-    // Subir el archivo al bucket 'courses'
     const { data, error: uploadError } = await supabase.storage
         .from('courses')
         .upload(filePath, file);
@@ -24,7 +21,6 @@ async function uploadImage(file: File) {
         throw new Error(`Error al subir imagen: ${uploadError.message}`);
     }
 
-    // Obtener la URL pública
     const { data: { publicUrl } } = supabase.storage
         .from('courses')
         .getPublicUrl(filePath);
@@ -32,93 +28,93 @@ async function uploadImage(file: File) {
     return publicUrl;
 }
 
-/**
- * GUARDAR: save
- * Ahora acepta valores que pueden incluir un objeto File para la imagen.
- */
-export async function saveCourse(values: any) { // Usamos any para permitir el objeto File inicial
+export async function saveCourse(values: any) {
     const supabase = await createClient();
 
     try {
-        let finalImageUrl = values.image_url;
+        const { image_url, modules, ...rest } = values;
+        let finalImageUrl = image_url;
 
-        // 1. Si image_url es un archivo (File), lo subimos primero
-        if (values.image_url instanceof File) {
-            finalImageUrl = await uploadImage(values.image_url);
+        const isFile = image_url && typeof image_url === 'object' && ('name' in image_url || image_url instanceof File);
+
+        if (isFile) {
+            finalImageUrl = await uploadImage(image_url);
         }
 
-        // 2. Validar con Zod (asegúrate que tu esquema acepte el string de la URL)
         const validated = courseSchema.parse({
-            ...values,
+            ...rest,
+            modules,
             image_url: finalImageUrl
         });
 
-        const { data: { user: adminUser } } = await supabase.auth.getUser();
-        const { modules, ...courseData } = validated;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No autorizado");
 
-        // 3. Insertar el curso base
+        const userDetails = `${user.user_metadata?.firstName || ''} ${user.user_metadata?.paternalSurname || ''}|${user.email}`;
+        const auditData = assignCreateProps(user.id, userDetails);
+
         const { data: newCourse, error: courseError } = await supabase
             .from('courses')
             .insert([{
-                ...courseData,
-                image_url: finalImageUrl, // Guardamos la URL pública
-                created_by: adminUser?.id || null,
-                updated_by: adminUser?.id || null,
-                is_deleted: false,
+                ...rest,
+                image_url: finalImageUrl,
+                ...auditData
             }])
             .select()
             .single();
 
         if (courseError) throw courseError;
 
-        // 4. Insertar los módulos del temario
         if (modules && modules.length > 0) {
-            const modulesWithRelation = modules.map((module, index) => ({
-                ...module,
+            const modulesWithRelation = modules.map((module: any, index: number) => ({
+                title: module.title,
                 course_id: newCourse.id,
-                order: module.order || index + 1,
-                created_by: adminUser?.id || null,
-                updated_by: adminUser?.id || null,
+                order: index + 1,
+                ...auditData
             }));
 
             const { error: modulesError } = await supabase
                 .from('course_modules')
                 .insert(modulesWithRelation);
 
-            if (modulesError) throw modulesError;
+            if (modulesError) {
+                await supabase.from('courses').delete().eq('id', newCourse.id);
+                throw modulesError;
+            }
         }
 
         revalidatePath('/administration/courses');
         return { success: true, id: newCourse.id };
+
     } catch (error: any) {
-        console.error('SERVER ERROR (save):', error);
-        return { success: false, error: error.message };
+        console.error('SERVER ERROR (saveCourse):', error);
+        return { success: false, error: error.message || "Error desconocido" };
     }
 }
 
-/**
- * ACTUALIZAR: update
- */
 export async function updateCourse(courseId: string, values: Partial<Course>) {
     const supabase = await createClient();
 
     try {
         const validated = courseSchema.partial().parse(values);
         const { modules, ...courseData } = validated;
-        const { data: { user: adminUser } } = await supabase.auth.getUser();
 
-        // 1. Actualizar datos principales
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No autorizado");
+
+        const userDetails = `${user.user_metadata?.firstName || ''}|${user.email}`;
+        const auditUpdate = assignUpdateProps(user.id, userDetails);
+
         const { error: courseError } = await supabase
             .from('courses')
             .update({
                 ...courseData,
-                updated_by: adminUser?.id,
+                ...auditUpdate
             })
             .eq('id', courseId);
 
         if (courseError) throw courseError;
 
-        // 2. Refrescar Temario (Borrar y Re-insertar)
         if (modules) {
             await supabase.from('course_modules').delete().eq('course_id', courseId);
 
@@ -126,7 +122,7 @@ export async function updateCourse(courseId: string, values: Partial<Course>) {
                 ...module,
                 course_id: courseId,
                 order: index + 1,
-                updated_by: adminUser?.id,
+                ...auditUpdate
             }));
 
             const { error: modulesError } = await supabase
@@ -144,20 +140,19 @@ export async function updateCourse(courseId: string, values: Partial<Course>) {
     }
 }
 
-/**
- * BORRADO LÓGICO: softDelete
- */
 export async function softDeleteCourse(courseId: string) {
     const supabase = await createClient();
 
     try {
-        const { data: { user: adminUser } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No autorizado");
+
+        const auditDelete = assignDeleteProps(user.id);
 
         const { error } = await supabase
             .from('courses')
             .update({
-                is_deleted: true,
-                updated_by: adminUser?.id,
+                ...auditDelete
             })
             .eq('id', courseId);
 
@@ -170,9 +165,6 @@ export async function softDeleteCourse(courseId: string) {
     }
 }
 
-/**
- * ESTADO: setStatus
- */
 export async function setStatusCourse(courseId: string, status: string) {
     const supabase = await createClient();
 
@@ -183,4 +175,34 @@ export async function setStatusCourse(courseId: string, status: string) {
 
     if (!error) revalidatePath('/administration/courses');
     return { error };
+}
+
+export async function getActiveCourses() {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('courses')
+        .select('id, title')
+        .eq('is_deleted', false)
+        .order('title', { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return data;
+}
+
+export async function getCourseModules(courseId: string) {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('course_modules')
+        .select('title, order')
+        .eq('course_id', courseId)
+        .order('order', { ascending: true });
+
+    if (error) {
+        console.error("Error fetching modules:", error);
+        throw new Error(error.message);
+    }
+
+    return data;
 }

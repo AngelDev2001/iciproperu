@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import {
-  IconAward,
   IconBook,
   IconBriefcase,
   IconFileCertificate,
@@ -113,11 +112,6 @@ const data = {
           icon: IconList,
         },
       ],
-    },
-    {
-      title: 'Certificados',
-      url: '/certificates',
-      icon: IconAward,
     },
   ],
   navClouds: [],

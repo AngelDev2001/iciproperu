@@ -75,7 +75,7 @@ const columns: ColumnDef<any>[] = [
         <div className="flex flex-col gap-1 min-w-37.5">
           <a
               href={`mailto:${row.original.email}`}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-warning transition-colors group"
           >
             <Mail className="size-3 shrink-0" />
             <span className="truncate max-w-35 md:max-w-45">{row.original.email}</span>

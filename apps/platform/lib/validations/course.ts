@@ -17,7 +17,7 @@ export const courseSchema = z.object({
     description: z.string().optional(),
     course_code: z.string().min(3),
     image_url: z.any().optional().nullable(),
-    modality: courseModalityEnum.default('online'),
+    modality: courseModalityEnum,
     modules: z.array(z.object({
         title: z.string().min(1, "El título del módulo es obligatorio"),
         order: z.number().optional()

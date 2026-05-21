@@ -1,6 +1,5 @@
 'use client';
 
-// Esquema de validación
 import * as z from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -13,11 +12,12 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Separator} from "@/components/ui/separator";
 import {Switch} from "@/components/ui/switch";
+import * as React from "react";
 
 const roleSchema = z.object({
     name: z.string().min(3, 'Nombre requerido'),
     description: z.string().min(5, 'Descripción requerida'),
-    permissions: z.record(z.array(z.string())), // Estructura: { modulo: ['ver', 'editar'] }
+    permissions: z.record(z.array(z.string())),
 });
 
 export default function CreateRolePage() {
@@ -27,21 +27,18 @@ export default function CreateRolePage() {
     });
 
     return (
-        <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto">
-            {/* Header con botón de regreso */}
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/roles"><IconArrowLeft /></Link>
-                </Button>
-                <div>
-                    <h1 className="text-2xl font-bold">Crear Nuevo Rol</h1>
-                    <p className="text-muted-foreground">Configura un cargo y sus niveles de acceso.</p>
-                </div>
+        <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-1">
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                    Crear Nuevo Rol
+                </h1>
+                <p className="text-xs md:text-sm text-muted-foreground font-medium">
+                    Configura un cargo y sus niveles de acceso.
+                </p>
             </div>
 
             <Form {...form}>
                 <form className="space-y-6">
-                    {/* Sección 1: Datos Generales */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Información Básica</CardTitle>
@@ -68,7 +65,6 @@ export default function CreateRolePage() {
                         </CardContent>
                     </Card>
 
-                    {/* Sección 2: Matriz de Permisos */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Matriz de Accesos</CardTitle>

@@ -59,19 +59,19 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
                             { label: 'Suspendido', value: 'suspended' },
                         ]}
                     />
-                    <DataTableFacetedFilter
-                        column={table.getColumn('role')}
-                        label="Rol de usuario"
-                        placeholder="Todos los roles"
-                        icon={IconUserShield}
-                        options={[
-                            { label: 'Superadmin', value: 'superadmin' },
-                            { label: 'Admin', value: 'admin' },
-                            { label: 'Promotor', value: 'promoter' },
-                            { label: 'Profesor', value: 'teacher' },
-                            { label: 'Estudiante', value: 'student' },
-                        ]}
-                    />
+                    {/*<DataTableFacetedFilter*/}
+                    {/*    column={table.getColumn('role')}*/}
+                    {/*    label="Rol de usuario"*/}
+                    {/*    placeholder="Todos los roles"*/}
+                    {/*    icon={IconUserShield}*/}
+                    {/*    options={[*/}
+                    {/*        { label: 'Superadmin', value: 'superadmin' },*/}
+                    {/*        { label: 'Admin', value: 'admin' },*/}
+                    {/*        { label: 'Promotor', value: 'promoter' },*/}
+                    {/*        { label: 'Profesor', value: 'teacher' },*/}
+                    {/*        { label: 'Estudiante', value: 'student' },*/}
+                    {/*    ]}*/}
+                    {/*/>*/}
                     <div className="hidden lg:block" />
                     <div className="hidden lg:block" />
                 </div>
