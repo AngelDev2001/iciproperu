@@ -25,5 +25,5 @@ export const formatLatamDate = (isoString:string, includeTime = false) => {
         })
     };
 
-    return date.toLocaleString('es-PE', options);
+    return date.toLocaleString('es-PE', options as any);
 };
