@@ -152,7 +152,7 @@ export default function UsersPage() {
             try {
                 const response = await getUsers();
                 if (response.success) {
-                    setUsers(response?.data);
+                    setUsers(response?.data as any);
                 }
             } catch (error) {
                 console.error("Error fetching users:", error);
