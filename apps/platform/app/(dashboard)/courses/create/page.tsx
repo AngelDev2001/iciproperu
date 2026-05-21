@@ -44,10 +44,10 @@ export default function NewCoursePage() {
     );
 }
 
-const CourseForm = ({onSubmit, isPending}) => {
+const CourseForm = ({onSubmit, isPending}: any) => {
 
     const form = useForm<Course>({
-        resolver: zodResolver(courseSchema),
+        resolver: zodResolver(courseSchema) as any,
         defaultValues: {
             title: "",
             course_code: "",
