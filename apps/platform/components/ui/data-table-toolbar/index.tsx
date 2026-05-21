@@ -8,8 +8,8 @@ import {DateRange} from "react-day-picker";
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent} from '@/components/ui/card';
-import {DatePickerWithRange} from './DatePickerWithRange';
 import {DataTableFacetedFilter} from "@/components/ui/data-table-toolbar/DataTableFacetedFilter";
+import {DatePickerWithRange} from "@/components/ui/DatePickerWithRange";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
