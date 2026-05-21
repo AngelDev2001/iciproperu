@@ -50,7 +50,7 @@ export function DataTable<TData, TValue>({
     setData(initialData);
   }, [initialData]);
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(() => data?.map(({ id }) => id) || [], [data]);
+  const dataIds = React.useMemo<UniqueIdentifier[]>(() => data?.map((item:any) => item.id) || [], [data]);
 
   const table = useReactTable({
     data,
