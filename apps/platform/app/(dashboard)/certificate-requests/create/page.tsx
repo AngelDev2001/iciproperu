@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation';
 import {useFieldArray, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {toast} from 'sonner';
-import {Mail, Phone, BookOpen, ClipboardList, FileBadge2, GraduationCap, IdCard, Loader2, User} from 'lucide-react';
+import {BookOpen, ClipboardList, FileBadge2, GraduationCap, IdCard, Loader2, Mail, Phone, User} from 'lucide-react';
 
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
@@ -37,7 +37,7 @@ export default function NewCertificateRequestPage() {
     }, []);
 
     const form = useForm<Certificate>({
-        resolver: zodResolver(certificateSchema),
+        resolver: zodResolver(certificateSchema) as any,
         defaultValues: {
             status: 'pending',
             document_type: 'DNI',
