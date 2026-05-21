@@ -284,7 +284,9 @@ export default function CertificateRequestsPage() {
         try {
             const response = await getCertificates();
             if (response.success) {
-                setData(response.data);
+                setData(response.data as any);
+            }else{
+                console.error(response.error);
             }
         } catch (error) {
             console.error("Error fetching certificates:", error);
